@@ -1,0 +1,66 @@
+name: HorseStats
+main: nl.patrickdruart.horsestats.HorseStatsPlugin
+version: 1.0
+api-version: 1.13
+author: MrCrackerplays
+description: "A plugin that allows you to view and edit horse stats"
+depend: [TabuuCore]
+commands:
+   horsestats:
+      aliases: [hs]
+      usage: "/horsestats help"
+      description: "shows the usage of /horsestats help"
+   horsestats help:
+      permission: "horsestats.command.help"
+      usage: "/horsestats help"
+      description: "shows the usage of all horsestats commands"
+   horsestats view:
+      permission: "horsestats.command.view"
+      usage: "/horsestats view"
+      description: "shows all horse-related stats of a horse-like entity"
+   horsestats reload:
+      permission: "horsestats.command.reload"
+      usage: "/horsestats reload"
+      description: "reloads all horsestats configs"
+   horsestats edit:
+      permission: "horsestats.command.edit"
+      usage: "/horsestats edit <stat> <value> [type]"
+      description: "shows usage of the horsestats edit command"
+   horsestats edit health:
+      permission: "horsestats.command.edit"
+      usage: "/horsestats edit health <value>"
+      description: "edits the maximum health of a horse-like entity"
+   horsestats edit jumpstrength:
+      permission: "horsestats.command.edit"
+      usage: "/horsestats edit jumpstrength <value> [blocks|number]"
+      description: "edits the jump strength of a horse-like entity"
+   horsestats edit speed:
+      permission: "horsestats.command.edit"
+      usage: "/horsestats edit speed <value> [blocks|number]"
+      description: "edits the speed of a horse-like entity"
+   horsestats edit color:
+      permission: "horsestats.command.edit"
+      usage: "/horsestats edit color <color>"
+      description: "edits the colour of a horse"
+   horsestats edit markings:
+      permission: "horsestats.command.edit"
+      usage: "/horsestats edit markings <marking>"
+      description: "edits the markings of a horse"
+   horsestats edit strength:
+      permission: "horsestats.command.edit"
+      usage: "/horsestats edit strength <value>"
+      description: "edits the strength of a llama"
+
+permissions:
+   horsestats.command.help:
+      description: Allows the use of the base horsestats command
+      default: true
+   horsestats.command.view:
+      description: Allows the use of the horsestats view command
+      default: op
+   horsestats.command.reload:
+      description: Allows the use of the horsestats reload command
+      default: op
+   horsestats.command.edit:
+      description: Allows the use of the horsestats edit command
+      default: op

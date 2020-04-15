@@ -1,0 +1,22 @@
+# Config version. Don't change this
+version: 1
+
+gameplay:
+   # The maximum range a player can be from a horse to edit/view it
+   range: 10
+
+settings:
+   language-file: "en-US"
+
+data:
+   # formula where x is movementspeed value
+   # x * speed-conversion = speed (blocks/second)
+   speed-conversion: 42.157787584
+   # formula where x is horse's jumpstrength
+   # height = ax^3 + bx^2 + cx + d
+   # default values from https://minecraft.gamepedia.com/Horse#Jump_strength
+   jump:
+      a: -0.1817584952
+      b: 3.689713992
+      c: 2.128599134
+      d: -0.343930367

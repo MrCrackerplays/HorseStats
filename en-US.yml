@@ -1,0 +1,19 @@
+# All text is parsed by https://github.com/Tabuu/TabuuCore/wiki/ComponentBuilder to allow for magic
+COMMAND_VIEW_NOT_FOUND: "&4No horse found within range!&r"
+COMMAND_VIEW_HEADER: "&2@===HorseStats===@&r"
+COMMAND_VIEW_NAME: "&aName: {NAME}&r"
+COMMAND_VIEW_HEALTH: "&cHealth: [&4{HEALTH}/{MAXHEALTH}](&c{HEARTS}\u2764/{MAXHEARTS}\u2764)&r"
+COMMAND_VIEW_JUMP: "&eJumpstrength: {JUMPNUMBER} = {JUMPBLOCKS} blocks&r"
+COMMAND_VIEW_SPEED: "&aMovement Speed: {SPEEDNUMBER} = {SPEEDBLOCKS} blocks/second&r"
+COMMAND_VIEW_COLOR: "&cColor: {COLOR}&r"
+COMMAND_VIEW_MARK: "&eMarkings: {MARK}&r"
+COMMAND_VIEW_STRENGTH: "&cStrength: {STRENGTH} = {STRENGTHSLOTS} inventory slots&r"
+
+COMMAND_EDIT_NOT_FOUND: "&4No horse found within range!&r"
+COMMAND_EDIT_NO_LLAMA: "&4No llama found within range!&r"
+COMMAND_EDIT_NO_COLOR: "&4This type of horse doesn't have any colors!&r"
+COMMAND_EDIT_NO_MARK: "&4This type horse doesn't have any markings!&r"
+COMMAND_EDIT_BLOCKS_WARN: "&cNote: blocks are only accurate up to and including 5 blocks, beyond that it may be a bit less than the amount of blocks specified.&r"
+COMMAND_EDIT_SUCCESS: "&e&lSuccessfully edited the horse!&r"
+
+COMMAND_RELOAD_SUCCESS: "&e&lSuccessfully reloaded the horsestats configs!&r"
