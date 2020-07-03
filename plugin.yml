@@ -1,6 +1,6 @@
 name: HorseStats
 main: nl.patrickdruart.horsestats.HorseStatsPlugin
-version: 1.0
+version: 1.1
 api-version: 1.13
 author: MrCrackerplays
 description: "A plugin that allows you to view and edit horse stats"

@@ -1,5 +1,7 @@
 package nl.patrickdruart.horsestats;
 
+import java.util.Arrays;
+
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,10 +22,8 @@ public class HorseStatsPlugin extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		String[] tabuucoreVersion = this.getServer().getPluginManager().getPlugin("TabuuCore").getDescription()
-				.getVersion().split("\\.");
-		if (Integer.valueOf(tabuucoreVersion[0]) < 2020 || Integer.valueOf(tabuucoreVersion[1]) < 4
-				|| Integer.valueOf(tabuucoreVersion[2]) < 5) {
+		if (!isTabuuCoreVersionSupported(
+				this.getServer().getPluginManager().getPlugin("TabuuCore").getDescription().getVersion())) {
 			this.getLogger().severe(
 					"Error: Using an older version of TabuuCore than required. Use TabuuCore version 2020.4.5 or higher!");
 			this.getServer().getPluginManager().disablePlugin(this);
@@ -68,5 +68,17 @@ public class HorseStatsPlugin extends JavaPlugin {
 		_configurationManager.reloadAll();
 		_language = _configurationManager
 				.getConfiguration(_configurationManager.getConfiguration("config").getString("settings.language-file"));
+	}
+
+	public boolean isTabuuCoreVersionSupported(String version) {
+		int[] supported = new int[] { 2020, 4, 5 };
+		int[] active = Arrays.stream(version.split("\\.")).mapToInt(Integer::parseInt).toArray();
+		for (int i = 0; i < 3; i++) {
+			if (active[i] < supported[i])
+				return false;
+			else if (active[i] > supported[i])
+				return true;
+		}
+		return true;
 	}
 }
