@@ -61,7 +61,7 @@ public class HorseStatsPlugin extends TabuuCorePlugin {
 		int[] active = Arrays.stream(version.split("\\.")).mapToInt(Integer::parseInt).toArray();
 
 		if(active[0] != supported[0]) return false;
-		else if(active[1] > supported[1]) return false;
+		else if(active[1] < supported[1]) return false;
 
 		return true;
 	}
