@@ -2,7 +2,7 @@
 COMMAND_VIEW_NOT_FOUND: "&4No horse found within range!&r"
 COMMAND_VIEW_HEADER: "&2@===HorseStats===@&r"
 COMMAND_VIEW_NAME: "&aName: {NAME}&r"
-COMMAND_VIEW_HEALTH: "&cHealth: [&4{HEALTH}/{MAXHEALTH}](&c{HEARTS}\u2764/{MAXHEARTS}\u2764)&r"
+COMMAND_VIEW_HEALTH: "&cHealth: [&4{HEALTH}/{MAXHEALTH}](show_text=&c{HEARTS}\u2764/{MAXHEARTS}\u2764)&r"
 COMMAND_VIEW_JUMP: "&eJumpstrength: {JUMPNUMBER} = {JUMPBLOCKS} blocks&r"
 COMMAND_VIEW_SPEED: "&aMovement Speed: {SPEEDNUMBER} = {SPEEDBLOCKS} blocks/second&r"
 COMMAND_VIEW_COLOR: "&cColor: {COLOR}&r"

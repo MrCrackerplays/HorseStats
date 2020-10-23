@@ -6,7 +6,7 @@ gameplay:
    range: 10
 
 settings:
-   language-file: "en-US"
+   language-file: "en-US.yml"
 
 data:
    # formula where x is movementspeed value
