@@ -59,12 +59,10 @@ public class HorseStatsPlugin extends TabuuCorePlugin {
 	public boolean isTabuuCoreVersionSupported(String version) {
 		int[] supported = new int[] { 2, 0, 0 };
 		int[] active = Arrays.stream(version.split("\\.")).mapToInt(Integer::parseInt).toArray();
-		for (int i = 0; i < 3; i++) {
-			if (active[i] < supported[i])
-				return false;
-			else if (active[i] > supported[i])
-				return true;
-		}
+
+		if(active[0] != supported[0]) return false;
+		else if(active[1] > supported[1]) return false;
+
 		return true;
 	}
 
