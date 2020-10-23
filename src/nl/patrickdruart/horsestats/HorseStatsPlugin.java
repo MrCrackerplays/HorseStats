@@ -1,24 +1,24 @@
 package nl.patrickdruart.horsestats;
 
-import java.util.Arrays;
-
-import org.bukkit.plugin.Plugin;
+import nl.patrickdruart.horsestats.commands.HorseStatsCommand;
+import nl.tabuu.tabuucore.configuration.IConfiguration;
+import nl.tabuu.tabuucore.configuration.file.YamlConfiguration;
+import nl.tabuu.tabuucore.plugin.TabuuCorePlugin;
+import nl.tabuu.tabuucore.util.Dictionary;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import nl.patrickdruart.horsestats.commands.HorseStatsCommand;
-import nl.tabuu.tabuucore.configuration.ConfigurationManager;
-import nl.tabuu.tabuucore.configuration.IConfiguration;
-import nl.tabuu.tabuucore.util.Dictionary;
+import java.util.Arrays;
 
 /**
- * HorseStats plugin's {@link JavaPlugin}/main class. Use {@link #getPlugin()}
+ * HorseStats plugin's {@link JavaPlugin}/main class. Use {@link #getInstance()} ()}
  * to get instance.
  */
-public class HorseStatsPlugin extends JavaPlugin {
+public class HorseStatsPlugin extends TabuuCorePlugin {
 
-	private static Plugin _plugin;
-	private static ConfigurationManager _configurationManager;
-	private static IConfiguration _language;
+	private static HorseStatsPlugin INSTANCE;
+
+	private Dictionary _local;
+	private IConfiguration _config;
 
 	@Override
 	public void onEnable() {
@@ -29,49 +29,35 @@ public class HorseStatsPlugin extends JavaPlugin {
 			this.getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
-		_plugin = this;
+		INSTANCE = this;
 
 		// loading configurations
-		_configurationManager = new ConfigurationManager(_plugin);
-		_configurationManager.addConfiguration("config");
-		IConfiguration config = _configurationManager.getConfiguration("config");
-		_configurationManager.addConfiguration(config.getString("settings.language-file"));
-		_language = _configurationManager.getConfiguration(config.getString("settings.language-file"));
+		_config = getConfigurationManager().addConfiguration("config.yml", YamlConfiguration.class);
+
+		String language = getConfiguration().getString("settings.language-file");
+		_local = getConfigurationManager().addConfiguration(language, YamlConfiguration.class).getDictionary("");
 
 		// setting commands handler
 		this.getCommand("horsestats").setExecutor(new HorseStatsCommand());
 	}
 
-	/**
-	 * @return This plugin's instance.
-	 */
-	public static Plugin getPlugin() {
-		return _plugin;
+	public void reloadAllConfigs() {
+		getConfigurationManager().reloadAll();
+
+		String language = getConfiguration().getString("settings.language-file");
+		_local = getConfigurationManager().addConfiguration(language, YamlConfiguration.class).getDictionary("");
 	}
 
-	/**
-	 * @return {@link ConfigurationManager} used to manage all configs.
-	 */
-	public static ConfigurationManager getConfigurationManager() {
-		return _configurationManager;
+	public Dictionary getLocal() {
+		return _local;
 	}
 
-	/**
-	 * @return {@link Dictionary} containing all translated messages from the
-	 *         language config as defined in the plugin config.
-	 */
-	public static Dictionary getDictionary() {
-		return _language.getDictionary("");
-	}
-
-	public static void reloadAllConfigs() {
-		_configurationManager.reloadAll();
-		_language = _configurationManager
-				.getConfiguration(_configurationManager.getConfiguration("config").getString("settings.language-file"));
+	public IConfiguration getConfiguration() {
+		return _config;
 	}
 
 	public boolean isTabuuCoreVersionSupported(String version) {
-		int[] supported = new int[] { 2020, 4, 5 };
+		int[] supported = new int[] { 2, 0, 0 };
 		int[] active = Arrays.stream(version.split("\\.")).mapToInt(Integer::parseInt).toArray();
 		for (int i = 0; i < 3; i++) {
 			if (active[i] < supported[i])
@@ -80,5 +66,18 @@ public class HorseStatsPlugin extends JavaPlugin {
 				return true;
 		}
 		return true;
+	}
+
+	/**
+	 * @return {@link Dictionary} containing all translated messages from the
+	 *         language config as defined in the plugin config.
+	 */
+	@Deprecated
+	public static Dictionary getDictionary() {
+		return getInstance().getLocal();
+	}
+
+	public static HorseStatsPlugin getInstance() {
+		return INSTANCE;
 	}
 }

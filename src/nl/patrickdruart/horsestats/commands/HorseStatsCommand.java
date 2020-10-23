@@ -35,12 +35,17 @@ import nl.tabuu.tabuucore.util.Dictionary;
  * Command class for base horsestats command.
  */
 public class HorseStatsCommand extends Command {
+
+	private Dictionary _local;
+
 	public HorseStatsCommand() {
 		super("horsestats");
 		this.addSubCommand("help", new HorseStatsHelpCommand(this));
 		this.addSubCommand("view", new HorseStatsViewCommand(this));
 		this.addSubCommand("edit", new HorseStatsEditCommand(this));
 		this.addSubCommand("reload", new HorseStatsReloadCommand(this));
+
+		_local = HorseStatsPlugin.getInstance().getLocal();
 	}
 
 	@Override
@@ -77,12 +82,15 @@ public class HorseStatsCommand extends Command {
 
 		@Override
 		protected CommandResult onCommand(CommandSender sender, List<Optional<?>> args) {
-			HorseStatsPlugin.reloadAllConfigs();
-			sender.spigot().sendMessage(ComponentBuilder
-					.parse((HorseStatsPlugin.getDictionary().translate("COMMAND_RELOAD_SUCCESS"))).build());
+			HorseStatsPlugin.getInstance().reloadAllConfigs();
+
+			if(sender instanceof Player)
+				_local.send((Player) sender, "COMMAND_RELOAD_SUCCESS");
+			else
+				sender.sendMessage(_local.translate("COMMAND_RELOAD_SUCCESS"));
+
 			return CommandResult.SUCCESS;
 		}
-
 	}
 
 	/**
@@ -98,21 +106,21 @@ public class HorseStatsCommand extends Command {
 		protected CommandResult onCommand(CommandSender sender, List<Optional<?>> args) {
 			Player player = (Player) sender;
 			AbstractHorse target = getTarget(player);
-			Dictionary dict = HorseStatsPlugin.getDictionary();
+
 			if (target == null) {
-				sender.spigot().sendMessage(ComponentBuilder.parse(dict.translate("COMMAND_VIEW_NOT_FOUND")).build());
+				_local.send(player, "COMMAND_VIEW_NOT_FOUND");
 				return CommandResult.SUCCESS;
 			}
 
 			// Header
-			ComponentBuilder header = ComponentBuilder.parse(dict.translate("COMMAND_VIEW_HEADER"));
+			ComponentBuilder header = ComponentBuilder.parse(_local.translate("COMMAND_VIEW_HEADER"));
 
 			// Name
-			ComponentBuilder name = ComponentBuilder.parse(dict.translate("COMMAND_VIEW_NAME", "{NAME}",
+			ComponentBuilder name = ComponentBuilder.parse(_local.translate("COMMAND_VIEW_NAME", "{NAME}",
 					target.getCustomName() != null ? target.getCustomName() : target.getType().name()));
 
 			// Health
-			ComponentBuilder health = ComponentBuilder.parse(dict.translate("COMMAND_VIEW_HEALTH", "{HEALTH}",
+			ComponentBuilder health = ComponentBuilder.parse(_local.translate("COMMAND_VIEW_HEALTH", "{HEALTH}",
 					"" + Math.round(target.getHealth() * 10000.0) / 10000.0, "{MAXHEALTH}",
 					"" + Math.round(target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 10000.0) / 10000.0,
 					"{HEARTS}", "" + Math.round((target.getHealth() / 2) * 10000.0) / 10000.0, "{MAXHEARTS}",
@@ -120,12 +128,12 @@ public class HorseStatsCommand extends Command {
 							/ 10000.0));
 
 			// Jump
-			ComponentBuilder jump = ComponentBuilder.parse(dict.translate("COMMAND_VIEW_JUMP", "{JUMPNUMBER}",
+			ComponentBuilder jump = ComponentBuilder.parse(_local.translate("COMMAND_VIEW_JUMP", "{JUMPNUMBER}",
 					"" + Math.round(target.getJumpStrength() * 10000.0) / 10000.0, "{JUMPBLOCKS}",
 					"" + Math.round(jumpToBlocks(target.getJumpStrength()) * 10000.0) / 10000.0));
 
 			// Speed
-			ComponentBuilder speed = ComponentBuilder.parse(dict.translate("COMMAND_VIEW_SPEED", "{SPEEDNUMBER}", ""
+			ComponentBuilder speed = ComponentBuilder.parse(_local.translate("COMMAND_VIEW_SPEED", "{SPEEDNUMBER}", ""
 					+ Math.round(target.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue() * 10000.0) / 10000.0,
 					"{SPEEDBLOCKS}",
 					"" + Math.round(
@@ -140,19 +148,19 @@ public class HorseStatsCommand extends Command {
 			if (target instanceof Horse) {
 				// Color
 				ComponentBuilder color = ComponentBuilder
-						.parse(dict.translate("COMMAND_VIEW_COLOR", "{COLOR}", ((Horse) target).getColor().name()));
+						.parse(_local.translate("COMMAND_VIEW_COLOR", "{COLOR}", ((Horse) target).getColor().name()));
 				// Markings
 				ComponentBuilder mark = ComponentBuilder
-						.parse(dict.translate("COMMAND_VIEW_MARK", "{MARK}", ((Horse) target).getStyle().name()));
+						.parse(_local.translate("COMMAND_VIEW_MARK", "{MARK}", ((Horse) target).getStyle().name()));
 				builder.thenText("\n").then(color).thenText("\n").then(mark);
 			}
 
 			// Llama
 			if (target instanceof Llama) {
 				// Strength
-				ComponentBuilder strength = ComponentBuilder.parse(dict.translate("COMMAND_VIEW_STRENGTH", "{STRENGTH}",
-						"" + INBTTagCompound.get(target).getInt("Strength"), "{STRENGTHSLOTS}",
-						"" + (INBTTagCompound.get(target).getInt("Strength") * 3)));
+				ComponentBuilder strength = ComponentBuilder.parse(_local.translate("COMMAND_VIEW_STRENGTH", "{STRENGTH}",
+						INBTTagCompound.get(target).getInt("Strength"), "{STRENGTHSLOTS}",
+						(INBTTagCompound.get(target).getInt("Strength") * 3)));
 				builder.thenText("\n").then(strength);
 			}
 
@@ -265,16 +273,14 @@ public class HorseStatsCommand extends Command {
 				AbstractHorse target = getTarget(player);
 				if (!(target instanceof Llama))
 					target = null;
-				Dictionary dict = HorseStatsPlugin.getDictionary();
 				if (target == null) {
-					sender.spigot()
-							.sendMessage(ComponentBuilder.parse(dict.translate("COMMAND_EDIT_NO_LLAMA")).build());
+					_local.send(player, "COMMAND_EDIT_NO_LLAMA");
 					return CommandResult.SUCCESS;
 				}
 				INBTTagCompound tag = INBTTagCompound.get(target);
 				tag.setInt("Strength", (Integer) args.get(0).get());
 				tag.apply(target);
-				sender.spigot().sendMessage(ComponentBuilder.parse(dict.translate("COMMAND_EDIT_SUCCESS")).build());
+				_local.send(player, "COMMAND_EDIT_SUCCESS");
 				return CommandResult.SUCCESS;
 			}
 
@@ -282,10 +288,8 @@ public class HorseStatsCommand extends Command {
 			protected List<String> onTabSuggest(CommandSender sender, List<String> arguments, String partial,
 					List<String> suggestions) {
 				if (arguments.size() != 0)
-					return new ArrayList<String>();
-				List<String> a = new ArrayList<String>();
-				a.addAll(Arrays.asList("1", "2", "3", "4", "5"));
-				return a;
+					return new ArrayList<>();
+				return new ArrayList<>(Arrays.asList("1", "2", "3", "4", "5"));
 			}
 		}
 
@@ -310,15 +314,12 @@ public class HorseStatsCommand extends Command {
 					return CommandResult.WRONG_SYNTAX;
 				Player player = (Player) sender;
 				AbstractHorse abstrTarget = getTarget(player);
-				Dictionary dict = HorseStatsPlugin.getDictionary();
 				if (abstrTarget == null) {
-					sender.spigot()
-							.sendMessage(ComponentBuilder.parse(dict.translate("COMMAND_EDIT_NOT_FOUND")).build());
+					_local.send(player, "COMMAND_EDIT_NOT_FOUND");
 					return CommandResult.SUCCESS;
 				}
 				if (!(abstrTarget instanceof Horse)) {
-					sender.spigot().sendMessage(ComponentBuilder
-							.parse(dict.translate("COMMAND_EDIT_NO_" + (_color ? "COLOR" : "MARK"))).build());
+					_local.send(player, "COMMAND_EDIT_NO_" + (_color ? "COLOR" : "MARK"));
 					return CommandResult.SUCCESS;
 				}
 				Horse target = (Horse) abstrTarget;
@@ -326,7 +327,7 @@ public class HorseStatsCommand extends Command {
 					target.setColor(Color.valueOf(((String) args.get(0).get()).toUpperCase()));
 				else
 					target.setStyle(Style.valueOf(((String) args.get(0).get()).toUpperCase()));
-				sender.spigot().sendMessage(ComponentBuilder.parse(dict.translate("COMMAND_EDIT_SUCCESS")).build());
+				_local.send(player, "COMMAND_EDIT_SUCCESS");
 				return CommandResult.SUCCESS;
 			}
 
@@ -350,7 +351,7 @@ public class HorseStatsCommand extends Command {
 	 */
 	private AbstractHorse getTarget(Player player) {
 		AbstractHorse target = null;
-		double range = HorseStatsPlugin.getConfigurationManager().getConfiguration("config").getDouble("gameplay.range",
+		double range = HorseStatsPlugin.getInstance().getConfiguration().getDouble("gameplay.range",
 				10.0D);
 		for (Entity entity : player.getNearbyEntities(range, range, range)) {
 			if (!(entity instanceof AbstractHorse) || !(isLookingAt(player, (AbstractHorse) entity)))
@@ -372,7 +373,7 @@ public class HorseStatsCommand extends Command {
 	 *         accurate up to and including 5 blocks.
 	 */
 	private double jumpToBlocks(double jumpstrength) {
-		IConfiguration config = HorseStatsPlugin.getConfigurationManager().getConfiguration("config");
+		IConfiguration config = HorseStatsPlugin.getInstance().getConfiguration();
 		// values from https://minecraft.gamepedia.com/Horse#Jump_strength
 		// y = ax^3 + bx^2 + cx + d
 		final double a = config.getDouble("data.jump.a", -0.1817584952);
@@ -381,7 +382,7 @@ public class HorseStatsCommand extends Command {
 		final double d = config.getDouble("data.jump.d", -0.343930367);
 		double x = jumpstrength;
 		double y = (a * x * x * x) + (b * x * x) + (c * x) + d;
-		return y < 16.375 ? y : 16.375;
+		return Math.min(y, 16.375);
 		// 16.375 seems to be the jump height for a value of 2.0 which is the hard limit
 		// for jump strength
 	}
@@ -392,7 +393,7 @@ public class HorseStatsCommand extends Command {
 	 *         accurate up to and including 5 blocks.
 	 */
 	private double blocksToJump(double blocks) {
-		IConfiguration config = HorseStatsPlugin.getConfigurationManager().getConfiguration("config");
+		IConfiguration config = HorseStatsPlugin.getInstance().getConfiguration();
 		// values from https://minecraft.gamepedia.com/Horse#Jump_strength
 		// 0 = ax^3 + bx^2 + cx + d - y
 		final double a = config.getDouble("data.jump.a", -0.1817584952);
@@ -415,13 +416,12 @@ public class HorseStatsCommand extends Command {
 	}
 
 	/**
-	 * @param double value is the movement speed value to convert to the amount of
-	 *               blocks per second.
+	 * @param value	is the movement speed value to convert to the amount of blocks per second.
 	 * @return the amount of blocks per second the value parameter equates to.
 	 */
 	private double speedToBlocks(double value) {
 		// values from https://minecraft.gamepedia.com/Tutorials/Horses#Speed
-		return (value * HorseStatsPlugin.getConfigurationManager().getConfiguration("config")
+		return (value * HorseStatsPlugin.getInstance().getConfiguration()
 				.getDouble("data.speed-conversion", 42.157787584D));
 		// beneath code is an example of why reading is important
 		// // speed goes up linearly thus a/b = c/d is applicable
@@ -444,7 +444,7 @@ public class HorseStatsCommand extends Command {
 	 */
 	private double blocksToSpeed(double blocks) {
 		// values from https://minecraft.gamepedia.com/Tutorials/Horses#Speed
-		return (blocks / HorseStatsPlugin.getConfigurationManager().getConfiguration("config")
+		return (blocks / HorseStatsPlugin.getInstance().getConfiguration()
 				.getDouble("data.speed-conversion", 42.157787584D));
 		// beneath code is an example of why reading is important
 		// // speed goes up linearly thus a/b = c/d is applicable
