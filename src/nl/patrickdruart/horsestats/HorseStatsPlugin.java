@@ -25,7 +25,7 @@ public class HorseStatsPlugin extends TabuuCorePlugin {
 		if (!isTabuuCoreVersionSupported(
 				this.getServer().getPluginManager().getPlugin("TabuuCore").getDescription().getVersion())) {
 			this.getLogger().severe(
-					"Error: Using an older version of TabuuCore than required. Use TabuuCore version 2020.4.5 or higher!");
+					"Error: Using an older version of TabuuCore than required. Use TabuuCore version 2.0.0 or higher!");
 			this.getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
