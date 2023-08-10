@@ -84,8 +84,9 @@ public class HorseStatsCommand extends Command {
 		protected CommandResult onCommand(CommandSender sender, List<Optional<?>> args) {
 			HorseStatsPlugin.getInstance().reloadAllConfigs();
 
-			if(sender instanceof Player)
-				_local.send((Player) sender, "COMMAND_RELOAD_SUCCESS");
+			if (sender instanceof Player)
+				sender.spigot()
+						.sendMessage(ComponentBuilder.parse(_local.translate("COMMAND_RELOAD_SUCCESS")).build());
 			else
 				sender.sendMessage(_local.translate("COMMAND_RELOAD_SUCCESS"));
 
@@ -108,7 +109,8 @@ public class HorseStatsCommand extends Command {
 			AbstractHorse target = getTarget(player);
 
 			if (target == null) {
-				_local.send(player, "COMMAND_VIEW_NOT_FOUND");
+				sender.spigot()
+						.sendMessage(ComponentBuilder.parse(_local.translate("COMMAND_VIEW_NOT_FOUND")).build());
 				return CommandResult.SUCCESS;
 			}
 
@@ -134,7 +136,7 @@ public class HorseStatsCommand extends Command {
 
 			// Speed
 			ComponentBuilder speed = ComponentBuilder.parse(_local.translate("COMMAND_VIEW_SPEED", "{SPEEDNUMBER}", ""
-					+ Math.round(target.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue() * 10000.0) / 10000.0,
+							+ Math.round(target.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue() * 10000.0) / 10000.0,
 					"{SPEEDBLOCKS}",
 					"" + Math.round(
 							speedToBlocks(target.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue()) * 10000.0)
@@ -239,12 +241,12 @@ public class HorseStatsCommand extends Command {
 
 			@Override
 			public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command bukkitCommand,
-					String label, String[] arguments) {
+											  String label, String[] arguments) {
 				List<String> result = super.onTabComplete(sender, bukkitCommand, label, arguments);
 				if (arguments.length == 2)
 					if (this.getName().split(" ")[2].equalsIgnoreCase("Jumpstrength")
 							|| this.getName().split(" ")[2].equalsIgnoreCase("Speed"))
-						for (String type : new String[] { "Blocks", "Number" })
+						for (String type : new String[]{"Blocks", "Number"})
 							if (type.toUpperCase().startsWith(arguments[1].toUpperCase()))
 								result.add(type);
 				return result;
@@ -274,19 +276,21 @@ public class HorseStatsCommand extends Command {
 				if (!(target instanceof Llama))
 					target = null;
 				if (target == null) {
-					_local.send(player, "COMMAND_EDIT_NO_LLAMA");
+					sender.spigot()
+							.sendMessage(ComponentBuilder.parse(_local.translate("COMMAND_EDIT_NO_LLAMA")).build());
 					return CommandResult.SUCCESS;
 				}
 				INBTTagCompound tag = INBTTagCompound.get(target);
 				tag.setInt("Strength", (Integer) args.get(0).get());
 				tag.apply(target);
-				_local.send(player, "COMMAND_EDIT_SUCCESS");
+				sender.spigot()
+						.sendMessage(ComponentBuilder.parse(_local.translate("COMMAND_EDIT_SUCCESS")).build());
 				return CommandResult.SUCCESS;
 			}
 
 			@Override
 			protected List<String> onTabSuggest(CommandSender sender, List<String> arguments, String partial,
-					List<String> suggestions) {
+												List<String> suggestions) {
 				if (arguments.size() != 0)
 					return new ArrayList<>();
 				return new ArrayList<>(Arrays.asList("1", "2", "3", "4", "5"));
@@ -315,11 +319,13 @@ public class HorseStatsCommand extends Command {
 				Player player = (Player) sender;
 				AbstractHorse abstrTarget = getTarget(player);
 				if (abstrTarget == null) {
-					_local.send(player, "COMMAND_EDIT_NOT_FOUND");
+					sender.spigot()
+							.sendMessage(ComponentBuilder.parse(_local.translate("COMMAND_EDIT_NOT_FOUND")).build());
 					return CommandResult.SUCCESS;
 				}
 				if (!(abstrTarget instanceof Horse)) {
-					_local.send(player, "COMMAND_EDIT_NO_" + (_color ? "COLOR" : "MARK"));
+					sender.spigot()
+							.sendMessage(ComponentBuilder.parse(_local.translate("COMMAND_EDIT_NO_" + (_color ? "COLOR" : "MARK"))).build());
 					return CommandResult.SUCCESS;
 				}
 				Horse target = (Horse) abstrTarget;
@@ -327,13 +333,14 @@ public class HorseStatsCommand extends Command {
 					target.setColor(Color.valueOf(((String) args.get(0).get()).toUpperCase()));
 				else
 					target.setStyle(Style.valueOf(((String) args.get(0).get()).toUpperCase()));
-				_local.send(player, "COMMAND_EDIT_SUCCESS");
+				sender.spigot()
+						.sendMessage(ComponentBuilder.parse(_local.translate("COMMAND_EDIT_SUCCESS")).build());
 				return CommandResult.SUCCESS;
 			}
 
 			@Override
 			public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command bukkitCommand,
-					String label, String[] arguments) {
+											  String label, String[] arguments) {
 				List<String> result = super.onTabComplete(sender, bukkitCommand, label, arguments);
 				if (arguments.length == 1)
 					for (Enum<?> e : _color ? Horse.Color.values() : Horse.Style.values())
@@ -347,7 +354,7 @@ public class HorseStatsCommand extends Command {
 	/**
 	 * @param player who's looking for an {@link AbstractHorse}
 	 * @return the closest {@link AbstractHorse} the player is looking at. Returns
-	 *         null if no {@link AbstractHorse} is found.
+	 * null if no {@link AbstractHorse} is found.
 	 */
 	private AbstractHorse getTarget(Player player) {
 		AbstractHorse target = null;
@@ -370,11 +377,11 @@ public class HorseStatsCommand extends Command {
 	 * @param jumpstrength is the jump strength value to convert to the amount of
 	 *                     blocks.
 	 * @return the amount of blocks that the value parameter equates to. Only
-	 *         accurate up to and including 5 blocks.
+	 * accurate up to and including 5 blocks.
 	 */
 	private double jumpToBlocks(double jumpstrength) {
 		IConfiguration config = HorseStatsPlugin.getInstance().getConfiguration();
-		// values from https://minecraft.gamepedia.com/Horse#Jump_strength
+		// values from https://minecraft.gamepedia.com/Horse?oldid=1649369#Jump_strength
 		// y = ax^3 + bx^2 + cx + d
 		final double a = config.getDouble("data.jump.a", -0.1817584952);
 		final double b = config.getDouble("data.jump.b", 3.689713992);
@@ -390,11 +397,11 @@ public class HorseStatsCommand extends Command {
 	/**
 	 * @param blocks is the amount of blocks to convert to the jump strength value.
 	 * @return the jump strength amount that the blocks parameter equates to. Only
-	 *         accurate up to and including 5 blocks.
+	 * accurate up to and including 5 blocks.
 	 */
 	private double blocksToJump(double blocks) {
 		IConfiguration config = HorseStatsPlugin.getInstance().getConfiguration();
-		// values from https://minecraft.gamepedia.com/Horse#Jump_strength
+		// values from https://minecraft.gamepedia.com/Horse?oldid=1649369#Jump_strength
 		// 0 = ax^3 + bx^2 + cx + d - y
 		final double a = config.getDouble("data.jump.a", -0.1817584952);
 		final double b = config.getDouble("data.jump.b", 3.689713992);
@@ -416,11 +423,11 @@ public class HorseStatsCommand extends Command {
 	}
 
 	/**
-	 * @param value	is the movement speed value to convert to the amount of blocks per second.
+	 * @param value is the movement speed value to convert to the amount of blocks per second.
 	 * @return the amount of blocks per second the value parameter equates to.
 	 */
 	private double speedToBlocks(double value) {
-		// values from https://minecraft.gamepedia.com/Tutorials/Horses#Speed
+		// values from https://minecraft.gamepedia.com/Tutorials/Horses?oldid=1640471#Speed
 		return (value * HorseStatsPlugin.getInstance().getConfiguration()
 				.getDouble("data.speed-conversion", 42.157787584D));
 		// beneath code is an example of why reading is important
@@ -443,7 +450,7 @@ public class HorseStatsCommand extends Command {
 	 * @return the movement speed value the blocks parameter equates to.
 	 */
 	private double blocksToSpeed(double blocks) {
-		// values from https://minecraft.gamepedia.com/Tutorials/Horses#Speed
+		// values from https://minecraft.gamepedia.com/Tutorials/Horses?oldid=1640471#Speed
 		return (blocks / HorseStatsPlugin.getInstance().getConfiguration()
 				.getDouble("data.speed-conversion", 42.157787584D));
 		// beneath code is an example of why reading is important
@@ -476,12 +483,12 @@ public class HorseStatsCommand extends Command {
 	 * originates from <a href=
 	 * "https://bukkit.org/threads/check-if-vector-goes-through-certain-area.393647/"
 	 * >https://bukkit.org/threads/check-if-vector-goes-through-certain-area.393647/</a>
-	 * 
+	 *
 	 * @param pointAA     corner AA.
 	 * @param pointBB     corner BB.
 	 * @param eyeLocation {@link LivingEntity}#getEyeLocation().
 	 * @return whether the eyeLocation parameter's direction is looking through an
-	 *         AABB area.
+	 * AABB area.
 	 */
 	private boolean traceRay(Vector pointAA, Vector pointBB, Location eyeLocation) {
 		Vector dir = eyeLocation.getDirection();
