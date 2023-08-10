@@ -27,7 +27,6 @@ import nl.tabuu.tabuucore.command.SenderType;
 import nl.tabuu.tabuucore.command.argument.ArgumentType;
 import nl.tabuu.tabuucore.command.argument.converter.OrderedArgumentConverter;
 import nl.tabuu.tabuucore.configuration.IConfiguration;
-import nl.tabuu.tabuucore.nms.wrapper.INBTTagCompound;
 import nl.tabuu.tabuucore.text.ComponentBuilder;
 import nl.tabuu.tabuucore.util.Dictionary;
 
@@ -161,8 +160,8 @@ public class HorseStatsCommand extends Command {
 			if (target instanceof Llama) {
 				// Strength
 				ComponentBuilder strength = ComponentBuilder.parse(_local.translate("COMMAND_VIEW_STRENGTH", "{STRENGTH}",
-						INBTTagCompound.get(target).getInt("Strength"), "{STRENGTHSLOTS}",
-						(INBTTagCompound.get(target).getInt("Strength") * 3)));
+						((Llama) target).getStrength(), "{STRENGTHSLOTS}",
+						(((Llama) target).getStrength() * 3)));
 				builder.thenText("\n").then(strength);
 			}
 
@@ -280,9 +279,12 @@ public class HorseStatsCommand extends Command {
 							.sendMessage(ComponentBuilder.parse(_local.translate("COMMAND_EDIT_NO_LLAMA")).build());
 					return CommandResult.SUCCESS;
 				}
-				INBTTagCompound tag = INBTTagCompound.get(target);
-				tag.setInt("Strength", (Integer) args.get(0).get());
-				tag.apply(target);
+				int new_strength = (Integer) args.get(0).get();
+				if (new_strength < 1)
+					new_strength = 1;
+				if (new_strength > 5)
+					new_strength = 5;
+				((Llama) target).setStrength(new_strength);
 				sender.spigot()
 						.sendMessage(ComponentBuilder.parse(_local.translate("COMMAND_EDIT_SUCCESS")).build());
 				return CommandResult.SUCCESS;
